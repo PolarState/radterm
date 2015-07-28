@@ -1,1 +1,1 @@
-gcc -std=c99 -g -Wall ./radterm.c serial/serial.c -o radterm3
+gcc -std=c99 -g -Wall ./radterm.c serial/serial.c -o radterm
