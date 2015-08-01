@@ -40,6 +40,7 @@ void ttyCanonicalMode(int state)
       ttystate.c_lflag &= ~ICANON;
       ttystate.c_cc[VMIN] = 1;
       break;
+
     default:
       ttystate.c_lflag |= ICANON;
       break;
@@ -54,6 +55,7 @@ static void exithandler()
   serialClose(driver.fd); 
   ttyCanonicalMode(0);
 }
+
 static void error(char *msg) { fprintf(stderr, "Error: %s\n", msg); exit(1); }
 
 static void take_ownership(const char *port) {
@@ -130,7 +132,7 @@ void inputLoop(int * fdList, int fdListLength)
     {
       c = fgetc(stdin);
       if(c != '\r')
-        write(fdList[1], &c, 1);
+        write(fdList[0], &c, 1);
     }
   }
 
@@ -198,7 +200,7 @@ int main(int argc, char **argv) {
   driver.verbose  = 0;
   driver.time     = 0;
 
-  printf("RaDtErM v0.0.3\n");
+  printf("RaDtErM v0.0.4\n");
 
   // parse command line arguments.
   while((c = getopt(argc, argv, "i:g:b:p:vdt")) != EOF)
