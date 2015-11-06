@@ -13,7 +13,8 @@
 #include "serial/serial.h"
 
 // Struct for the driver state
-typedef struct {
+typedef struct driver_t
+{
   const char *pidfile;
   const char *logfile;
   const char *port;
@@ -22,6 +23,7 @@ typedef struct {
   int   daemon;
   int   verbose;
   int   time;
+
 } driver_t; 
 
 
@@ -78,12 +80,12 @@ static void take_ownership(const char *port) {
 // loop checks for input on terminal and serial port & passes data to parsers.
 void inputLoop(int * fdList, int fdListLength) 
 {
-  int8_t c;
-  uint8_t b;
-  struct timeval t;
+  char            c;
+  unsigned char   b;
+  struct timeval  t;
   unsigned long long millisecondsSinceEpoch;
   int fdListMax;
-  int result;
+  int result, readFault;
   fd_set fds;
 
   if(fdListLength == 0)
@@ -105,8 +107,9 @@ void inputLoop(int * fdList, int fdListLength)
   // remove terminal canonical mode for parsing ease.
   ttyCanonicalMode(1);
 
-  result = 0;
-  while(result != -1)
+  result    = 0;
+  readFault = 0;
+  while((result != -1) && readFault != 1)
   {
     FD_ZERO(&fds);
     for(int i = 0; i < fdListLength; i++)
@@ -116,17 +119,22 @@ void inputLoop(int * fdList, int fdListLength)
 
     if(FD_ISSET(fdList[0], &fds))
     {
-      read(fdList[0], &b, 1);
-      printf("%c", b);
-      if(driver.time == 1 && b == '\n')
+      if(read(fdList[0], &b, 1) == 1)
       {
-        gettimeofday(&t, NULL);
-        millisecondsSinceEpoch =
-          (unsigned long long)(t.tv_sec)  * 1000 +
-          (unsigned long long)(t.tv_usec) / 1000;
-        printf("%11llu: ", millisecondsSinceEpoch);
+        printf("%c", b);
+        if(driver.time == 1 && b == '\n')
+        {
+          gettimeofday(&t, NULL);
+          millisecondsSinceEpoch =
+            (unsigned long long)(t.tv_sec)  * 1000 +
+            (unsigned long long)(t.tv_usec) / 1000;
+          printf("%11llu: ", millisecondsSinceEpoch);
+        }
       }
-      
+      else
+      {
+        readFault = 1;
+      }
     }
     else if(FD_ISSET(fdList[1], &fds))
     {
@@ -155,12 +163,8 @@ static void start(driver_t *driver) {
 
   atexit(exithandler);
 
-
-#ifdef DEBUG
   printf("Connected! Datareceived will be printed...\n");
   printf("Use CTRL+C to quit.\n");
-#endif
-
 
   int fdList[2];
   fdList[0] = driver->fd;
@@ -172,7 +176,9 @@ static void start(driver_t *driver) {
 
 //@@ add ability to run as background thread.
 void daemonize(void)
-{}
+{
+  ;
+}
 
 // Prints correct usage.
 int usage(void)
@@ -200,7 +206,7 @@ int main(int argc, char **argv) {
   driver.verbose  = 0;
   driver.time     = 0;
 
-  printf("RaDtErM v0.0.4\n");
+  printf("RaDtErM v0.1.0\n");
 
   // parse command line arguments.
   while((c = getopt(argc, argv, "i:g:b:p:vdt")) != EOF)
