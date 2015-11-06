@@ -163,7 +163,7 @@ static void start(driver_t *driver) {
 
   atexit(exithandler);
 
-  printf("Connected! Datareceived will be printed...\n");
+  printf("Connected! Data received will be printed...\n");
   printf("Use CTRL+C to quit.\n");
 
   int fdList[2];
