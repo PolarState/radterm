@@ -2,8 +2,6 @@
 RaDtErM!! ^.^
 Serial Terminal for Macs!
 
-currently requires root privilege (probably not for a good reason)
-
 ## Options
 * -b --baud <num>      specify the baud rate, defaults to 9600
 * -p --port <path>     specify the port. If empty, tries to guess based on your platform
@@ -13,4 +11,4 @@ currently requires root privilege (probably not for a good reason)
 * -v --verbose         enable verbose output
 
 ## Example Usage:
-sudo ./radterm -t -b 15200 -p /dev/tty.*
+./radterm -t -b 15200 -p /dev/tty.*
