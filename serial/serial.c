@@ -62,6 +62,10 @@ int serialOpen(const char *port, unsigned int baud) {
             cfsetispeed(&options, B115200);
             cfsetospeed(&options, B115200);
             break;
+        case 230400:
+            cfsetispeed(&options, B230400);
+            cfsetospeed(&options, B230400);
+            break;
         default:
             fprintf(stderr, "Warning: Baudrate not supported!\n");
             serialClose(fd);
@@ -73,6 +77,8 @@ int serialOpen(const char *port, unsigned int baud) {
 #ifdef XONXOFF
     options.c_iflag |= IXON; // XON-XOFF Flow Control
 #endif
+    // Input Modes
+    options.c_iflag |= BRKINT;
 
     // Output Modes
     options.c_oflag |= OPOST; // Post-process output
@@ -88,6 +94,7 @@ int serialOpen(const char *port, unsigned int baud) {
     // Special characters
     options.c_cc[VMIN] = 0; // Always return...
     options.c_cc[VTIME] = 0; // ..immediately from read()
+
 #ifdef XONXOFF
     options.c_cc[VSTOP] = XOFF;
     options.c_cc[VSTART] = XON;

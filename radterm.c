@@ -61,7 +61,7 @@ static void exithandler()
 static void error(char *msg) { fprintf(stderr, "Error: %s\n", msg); exit(1); }
 
 static void take_ownership(const char *port) {
-  int  user = getuid();
+  int user  = getuid();
   int group = getgid();
 
   #ifdef DEBUG
@@ -152,7 +152,7 @@ void inputLoop(int * fdList, int fdListLength)
  */ 
 static void start(driver_t *driver) {
 
-  take_ownership(driver->port);
+  // take_ownership(driver->port);
 
   driver->fd = serialOpen(driver->port, driver->baud);
     
